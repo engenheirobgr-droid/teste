@@ -228,7 +228,7 @@
 <script type="module">
     // --- MÓDULOS FIREBASE ---
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc, writeBatch, getDocs, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     // --- VARIÁVEIS GLOBAIS ---
@@ -243,15 +243,15 @@
     const initialData = [
         {"Colaborador":"Samuel Alves","Data":"2025-08-01","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
         {"Colaborador":"Guilherme Devens","Data":"2025-08-01","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
-        {"Colaborador":"Inácio","Data":"2025-08-04","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepçãoColaborador":"","Próximos Passos":[]},
-        {"Colaborador":"Jonatas Santana","Data":"2025-08-04","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepçãoColaborador":"","Próximos Passos":[]},
-        {"Colaborador":"Rafael Baqueiro","Data":"2025-08-05","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepçãoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Inácio","Data":"2025-08-04","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Jonatas Santana","Data":"2025-08-04","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Rafael Baqueiro","Data":"2025-08-05","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
         {"Colaborador":"Josias Reis","Data":"2025-08-05","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
         {"Colaborador":"Antonio Francisco","Data":"2025-08-06","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
-        {"Colaborador":"Rodrigo Clemente","Data":"2025-08-06","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepçãoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Rodrigo Clemente","Data":"2025-08-06","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
         {"Colaborador":"Carlos Henrique","Data":"2025-08-07","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
         {"Colaborador":"Lucas Urpia","Data":"2025-08-07","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
-        {"Colaborador":"Wagner Marinho","Data":"2025-08-08","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepçãoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Wagner Marinho","Data":"2025-08-08","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
         {"Colaborador":"Mateus Esteves","Data":"2025-08-08","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
         {"Colaborador":"Lerena Reis","Data":"2025-08-11","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
         {"Colaborador":"Camilo Nunes","Data":"2025-08-11","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
@@ -268,37 +268,37 @@
         {"Colaborador":"Antonio Francisco","Data":"2025-09-25","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
         {"Colaborador":"Rodrigo Clemente","Data":"2025-09-25","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
         {"Colaborador":"Carlos Henrique","Data":"2025-09-26","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
-        {"Colaborador":"Lucas Urpia","Data":"2025-09-26","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepçãoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Lucas Urpia","Data":"2025-09-26","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
         {"Colaborador":"Wagner Marinho","Data":"2025-09-29","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
-        {"Colaborador":"Mateus Esteves","Data":"2025-09-29","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepçãoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Mateus Esteves","Data":"2025-09-29","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
         {"Colaborador":"Lerena Reis","Data":"2025-09-30","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
         {"Colaborador":"Camilo Nunes","Data":"2025-09-30","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
         {"Colaborador":"Liz","Data":"2025-10-01","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
         {"Colaborador":"Diego Duque","Data":"2025-10-01","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
         {"Colaborador":"Lucas Menezes","Data":"2025-10-02","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
         {"Colaborador":"Tales Santana","Data":"2025-10-02","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
-        {"Colaborador":"Samuel Alves","Data":"2025-10-03","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepçãoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Samuel Alves","Data":"2025-10-03","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
         {"Colaborador":"Guilherme Devens","Data":"2025-10-03","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
         {"Colaborador":"Inácio","Data":"2025-10-06","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
         {"Colaborador":"Jonatas Santana","Data":"2025-10-06","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
-        {"Colaborador":"Rafael Baqueiro","Data":"2025-10-07","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepçãoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Rafael Baqueiro","Data":"2025-10-07","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
         {"Colaborador":"Josias Reis","Data":"2025-10-07","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
         {"Colaborador":"Antonio Francisco","Data":"2025-10-08","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
         {"Colaborador":"Rodrigo Clemente","Data":"2025-10-08","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
         {"Colaborador":"Carlos Henrique","Data":"2025-10-09","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
         {"Colaborador":"Lucas Urpia","Data":"2025-10-09","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
-        {"Colaborador":"Wagner Marinho","Data":"2025-10-10","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepçãoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Wagner Marinho","Data":"2025-10-10","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
         {"Colaborador":"Mateus Esteves","Data":"2025-10-10","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
         {"Colaborador":"Lerena Reis","Data":"2025-10-13","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
         {"Colaborador":"Camilo Nunes","Data":"2025-10-13","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
-        {"Colaborador":"Liz","Data":"2025-10-14","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepçãoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Liz","Data":"2025-10-14","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
         {"Colaborador":"Diego Duque","Data":"2025-10-14","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
         {"Colaborador":"Lucas Menezes","Data":"2025-10-15","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
         {"Colaborador":"Tales Santana","Data":"2025-10-15","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
-        {"Colaborador":"Samuel Alves","Data":"2025-11-03","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepçãoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Samuel Alves","Data":"2025-11-03","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
         {"Colaborador":"Guilherme Devens","Data":"2025-11-03","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
-        {"Colaborador":"Inácio","Data":"2025-11-04","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepçãoColaborador":"","Próximos Passos":[]},
-        {"Colaborador":"Jonatas Santana","Data":"2025-11-04","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepçãoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Inácio","Data":"2025-11-04","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Jonatas Santana","Data":"2025-11-04","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
         {"Colaborador":"Rafael Baqueiro","Data":"2025-11-05","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
         {"Colaborador":"Josias Reis","Data":"2025-11-05","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
         {"Colaborador":"Antonio Francisco","Data":"2025-11-06","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
@@ -309,12 +309,29 @@
         {"Colaborador":"Mateus Esteves","Data":"2025-11-10","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
         {"Colaborador":"Lerena Reis","Data":"2025-11-11","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
         {"Colaborador":"Camilo Nunes","Data":"2025-11-11","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
-        {"Colaborador":"Liz","Data":"2025-11-12","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepçãoColaborador":"","Próximos Passos":[]},
-        {"Colaborador":"Diego Duque","Data":"2025-11-12","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepçãoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Liz","Data":"2025-11-12","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Diego Duque","Data":"2025-11-12","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
         {"Colaborador":"Lucas Menezes","Data":"2025-11-13","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
-        {"Colaborador":"Tales Santana","Data":"2025-11-13","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]}
+        {"Colaborador":"Tales Santana","Data":"2025-11-13","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Samuel Alves","Data":"2025-12-01","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Guilherme Devens","Data":"2025-12-01","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Inácio","Data":"2025-12-02","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Jonatas Santana","Data":"2025-12-02","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Rafael Baqueiro","Data":"2025-12-03","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Josias Reis","Data":"2025-12-03","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Antonio Francisco","Data":"2025-12-04","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Rodrigo Clemente","Data":"2025-12-04","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Carlos Henrique","Data":"2025-12-05","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Lucas Urpia","Data":"2025-12-05","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Wagner Marinho","Data":"2025-12-08","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Mateus Esteves","Data":"2025-12-08","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Lerena Reis","Data":"2025-12-09","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Camilo Nunes","Data":"2025-12-09","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Liz","Data":"2025-12-10","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Diego Duque","Data":"2025-12-10","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Lucas Menezes","Data":"2025-12-11","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Tales Santana","Data":"2025-12-11","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]}
     ];
-
     document.addEventListener('DOMContentLoaded', () => {
         // --- Seletores de DOM ---
         const modal = document.getElementById('feedback-modal');
@@ -338,7 +355,7 @@
                   appId: "1:581853045940:web:0291ae141e3e725668e3e1",
                   measurementId: "G-5JBKPGLEGR"
                 };
-
+                
                 // O App ID é necessário para construir o caminho da coleção
                 const appId = "1:581853045940:web:0291ae141e3e725668e3e1";
                 
@@ -356,15 +373,14 @@
                     }
                 });
 
-                // Este código foi simplificado para usar apenas o login anônimo.
-                // Isso garante que ele funcione em ambientes externos ao Gemini.
+                // Autenticação anônima é necessária para este app
                 await signInAnonymously(auth);
             } catch (error) {
                 console.error("Firebase initialization failed:", error);
                 document.getElementById('loading-overlay').innerHTML = `<p class="text-red-400">Falha ao conectar com o banco de dados. Tente recarregar a página.<br>Verifique se o método de login 'Anônimo' está ativado no seu projeto Firebase.</p>`;
             }
         };
-        
+
         // --- FUNÇÕES DE DADOS (FIRESTORE) ---
         const seedInitialData = async () => {
             const batch = writeBatch(db);
@@ -406,7 +422,7 @@
             }
         };
 
-        // --- Funções de Renderização Específicas (sem alterações) ---
+        // --- Funções de Renderização Específicas ---
         const renderMetrics = () => {
             const total = feedbackData.length;
             const realizados = feedbackData.filter(item => item.Status === 'Realizado').length;
@@ -421,18 +437,37 @@
 
         const renderChart = () => {
             const ctx = document.getElementById('feedback-chart').getContext('2d');
-            const labels = ['Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+            
+            // Lógica para gerar os meses dinamicamente com base nos dados existentes
+            const uniqueMonths = [...new Set(feedbackData.map(item => {
+                if (!item.Data) return null;
+                const date = new Date(item.Data + "T00:00:00");
+                return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0');
+            }).filter(Boolean))];
+
+            uniqueMonths.sort();
+
+            const labels = uniqueMonths.map(monthYear => {
+                const [year, month] = monthYear.split('-');
+                const date = new Date(year, month - 1);
+                return date.toLocaleString('pt-BR', { month: 'long', timeZone: 'UTC' });
+            });
+            
             const data = {
-                labels,
+                labels: labels,
                 datasets: [
                     { label: 'Realizado', data: [], backgroundColor: 'rgba(16, 185, 129, 0.7)', borderColor: 'rgba(16, 185, 129, 1)', borderWidth: 1, borderRadius: 4 },
                     { label: 'Programado', data: [], backgroundColor: 'rgba(245, 158, 11, 0.7)', borderColor: 'rgba(245, 158, 11, 1)', borderWidth: 1, borderRadius: 4 }
                 ]
             };
-            const monthMap = { '08': 'Agosto', '09': 'Setembro', '10': 'Outubro', '11': 'Novembro', '12': 'Dezembro' };
-            labels.forEach(month => {
-                const monthNumber = Object.keys(monthMap).find(key => monthMap[key] === month);
-                const monthlyData = feedbackData.filter(item => item.Data && item.Data.substring(5, 7) === monthNumber);
+
+            uniqueMonths.forEach(monthYear => {
+                const monthlyData = feedbackData.filter(item => {
+                    if (!item.Data) return false;
+                    const itemMonthYear = new Date(item.Data + "T00:00:00").toISOString().substring(0, 7);
+                    return itemMonthYear === monthYear;
+                });
+                
                 data.datasets[0].data.push(monthlyData.filter(d => d.Status === 'Realizado').length);
                 data.datasets[1].data.push(monthlyData.filter(d => d.Status === 'Programado').length);
             });
@@ -652,16 +687,32 @@
         const handleSave = async (event) => {
             event.preventDefault();
             const id = document.getElementById('feedback-id').value;
-            const actionItems = Array.from(document.querySelectorAll('#action-items-container .action-item')).map(div => ({
-                id: div.dataset.id, text: div.querySelector('.action-text').value, dueDate: div.querySelector('.action-duedate').value, 
-                responsavel: div.querySelector('.action-responsavel').value, completed: div.querySelector('.action-completed').checked
-            }));
+            const actionItems = Array.from(document.querySelectorAll('#action-items-container .action-item')).map(div => {
+                // Check if the input elements exist before accessing their value
+                const textInput = div.querySelector('.action-text');
+                const dueDateInput = div.querySelector('.action-duedate');
+                const responsavelSelect = div.querySelector('.action-responsavel');
+                const completedCheckbox = div.querySelector('.action-completed');
+
+                return {
+                    id: div.dataset.id,
+                    text: textInput ? textInput.value : '',
+                    dueDate: dueDateInput ? dueDateInput.value : '',
+                    responsavel: responsavelSelect ? responsavelSelect.value : '',
+                    completed: completedCheckbox ? completedCheckbox.checked : false
+                };
+            });
 
             const formData = {
-                Colaborador: document.getElementById('colaborador').value.trim(), Data: document.getElementById('data').value, Tipo: document.getElementById('tipo').value,
-                Status: document.getElementById('status').value, Contexto: document.getElementById('feedback-contexto').value.trim(),
-                Observacao: document.getElementById('feedback-observacao').value.trim(), Impacto: document.getElementById('feedback-impacto').value.trim(),
-                PercepcaoColaborador: document.getElementById('feedback-colaborador-percepcao').value.trim(), 'Próximos Passos': actionItems
+                Colaborador: document.getElementById('colaborador').value.trim(),
+                Data: document.getElementById('data').value,
+                Tipo: document.getElementById('tipo').value,
+                Status: document.getElementById('status').value,
+                Contexto: document.getElementById('feedback-contexto').value.trim(),
+                Observacao: document.getElementById('feedback-observacao').value.trim(),
+                Impacto: document.getElementById('feedback-impacto').value.trim(),
+                PercepcaoColaborador: document.getElementById('feedback-colaborador-percepcao').value.trim(),
+                'Próximos Passos': actionItems
             };
 
             if (!formData.Colaborador || !formData.Data) {
