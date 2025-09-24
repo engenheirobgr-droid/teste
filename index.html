@@ -1,0 +1,831 @@
+https://g.co/gemini/share/674669335e26
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Liderança Executivo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-bg: #111827; /* Slate 900 */
+            --color-surface: #1f2937; /* Slate 800 */
+            --color-border: #374151; /* Slate 700 */
+            --color-text-primary: #f9fafb; /* Slate 50 */
+            --color-text-secondary: #9ca3af; /* Slate 400 */
+            --color-accent-green: #10b981; /* Emerald 500 */
+            --color-accent-orange: #f59e0b; /* Amber 500 */
+            --color-accent-blue: #3b82f6; /* Blue 500 */
+            --color-accent-red: #ef4444; /* Red 500 */
+        }
+        body { 
+            font-family: 'Inter', sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-text-primary);
+        }
+        .tab.active { 
+            color: var(--color-accent-blue); 
+            border-bottom-color: var(--color-accent-blue);
+        }
+        .accordion-header[aria-expanded="true"] .accordion-arrow { 
+            transform: rotate(180deg); 
+        }
+        .action-item input[type="checkbox"]:checked + label { 
+            text-decoration: line-through; 
+            color: var(--color-text-secondary);
+        }
+        .blinking { animation: blink-animation 1.5s steps(2, start) infinite; }
+        @keyframes blink-animation { to { visibility: hidden; } }
+        .spinner {
+            border: 2px solid #374151;
+            border-top: 2px solid #3b82f6;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--color-bg); }
+        ::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #4b5563; /* Slate 600 */ }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div id="loading-overlay" class="fixed inset-0 bg-slate-900 flex items-center justify-center z-50">
+        <div class="text-center">
+            <div class="spinner w-8 h-8 mx-auto"></div>
+            <p class="mt-4 text-gray-400">Conectando ao banco de dados...</p>
+        </div>
+    </div>
+
+    <div id="app-container" class="container mx-auto p-4 md:p-8 invisible">
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-100 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3 text-blue-500"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                Painel de Liderança Executivo
+            </h1>
+            <p class="mt-2 text-gray-400">Análise de Time, Acompanhamento de Feedbacks e Planos de Ação</p>
+        </header>
+
+        <div id="metrics-container" class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8"></div>
+
+        <!-- Abas de Navegação -->
+        <div class="mb-8 border-b border-gray-700">
+            <nav class="flex space-x-8" aria-label="Tabs">
+                <button class="tab active py-4 px-1 border-b-2 font-medium text-base border-transparent text-gray-400 hover:text-gray-200" data-tab="dashboard">Dashboard</button>
+                <button class="tab py-4 px-1 border-b-2 font-medium text-base border-transparent text-gray-400 hover:text-gray-200" data-tab="feedbacks">Feedbacks</button>
+                <button class="tab py-4 px-1 border-b-2 font-medium text-base border-transparent text-gray-400 hover:text-gray-200" data-tab="analise">Análise Rápida</button>
+                <button class="tab py-4 px-1 border-b-2 font-medium text-base border-transparent text-gray-400 hover:text-gray-200" data-tab="acoes">Plano de Ação</button>
+            </nav>
+        </div>
+
+        <!-- Conteúdo das Abas -->
+        <main>
+            <!-- ABA: Dashboard -->
+            <div id="dashboard-content" class="tab-content">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="lg:col-span-2 bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-lg">
+                        <h2 class="text-xl font-semibold mb-4 text-gray-100">Visão Geral de Feedbacks por Mês</h2>
+                        <div class="h-80"><canvas id="feedback-chart"></canvas></div>
+                    </div>
+                    <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-lg">
+                        <h2 class="text-xl font-semibold mb-4 text-gray-100">Resumo das Ações por Responsável</h2>
+                        <div class="h-64"><canvas id="actions-chart-v1"></canvas></div>
+                    </div>
+                    <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-lg">
+                        <h2 class="text-xl font-semibold mb-4 text-gray-100">Tipos de Feedback</h2>
+                        <div class="h-64"><canvas id="types-chart"></canvas></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ABA: Feedbacks -->
+            <div id="feedbacks-content" class="tab-content hidden">
+                 <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-lg mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
+                     <h2 class="text-xl font-semibold text-gray-100">Registros por Mês</h2>
+                    <button id="add-feedback-btn" class="w-full md:w-auto bg-blue-600 text-white font-bold px-5 py-2 rounded-lg shadow-md hover:bg-blue-700 transition flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        Novo Feedback
+                    </button>
+                </div>
+                <div id="feedback-accordion" class="space-y-4"></div>
+            </div>
+
+            <!-- ABA: Análise Rápida -->
+            <div id="analise-content" class="tab-content hidden">
+                 <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-lg">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                        <h2 class="text-xl font-semibold text-gray-100 mb-4 md:mb-0">Análise de Sentimento da Equipe</h2>
+                        <button id="generate-analysis-btn" class="bg-blue-600 text-white font-bold px-5 py-2 rounded-lg shadow-md hover:bg-blue-700 transition flex items-center justify-center">
+                             <svg xmlns="http://www.w3.org/2000/svg" class="mr-2" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10H8"/><path d="M12 20V10H16"/><path d="M12 20V4"/><path d="M20 12H4"/></svg>
+                            Gerar Análise Rápida
+                        </button>
+                    </div>
+                    <div id="analysis-output" class="p-5 min-h-[200px] bg-slate-900 rounded-lg text-gray-300 text-sm leading-relaxed border border-slate-700 whitespace-pre-wrap">
+                        Clique no botão para compilar as anotações de todos os feedbacks e gerar um resumo dos temas recorrentes.
+                    </div>
+                </div>
+            </div>
+
+            <!-- ABA: Plano de Ação -->
+            <div id="acoes-content" class="tab-content hidden">
+                 <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-lg">
+                    <h2 class="text-xl font-semibold mb-4 text-gray-100">Plano de Ação Geral</h2>
+                    <div id="master-action-list" class="space-y-3"></div>
+                 </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal para Edição/Adição -->
+    <div id="feedback-modal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 hidden z-50">
+         <div class="bg-slate-800 border border-slate-700 rounded-xl shadow-2xl w-full max-w-3xl transform transition-all duration-300">
+            <div class="p-6 border-b border-slate-700 flex justify-between items-center">
+                <h3 id="modal-title" class="text-2xl font-semibold text-gray-100"></h3>
+                <button id="close-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button>
+            </div>
+            <div class="p-6 max-h-[70vh] overflow-y-auto">
+                <form id="feedback-form" class="space-y-6">
+                    <input type="hidden" id="feedback-id">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="colaborador" class="block text-sm font-medium text-gray-300">Colaborador</label>
+                            <input type="text" id="colaborador" class="mt-1 block w-full bg-slate-900 border-slate-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-white" required>
+                        </div>
+                        <div>
+                            <label for="data" class="block text-sm font-medium text-gray-300">Data</label>
+                            <input type="date" id="data" class="mt-1 block w-full bg-slate-900 border-slate-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-white" required>
+                        </div>
+                        <div>
+                            <label for="tipo" class="block text-sm font-medium text-gray-300">Tipo de Conversa</label>
+                            <select id="tipo" class="mt-1 block w-full bg-slate-900 border-slate-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-white">
+                                <option>Check-in</option><option>Reconhecimento</option><option>Desenvolvimento</option><option>Correção de Rota</option><option>Carreira</option>
+                            </select>
+                        </div>
+                        <div>
+                           <label for="status" class="block text-sm font-medium text-gray-300">Status</label>
+                           <select id="status" class="mt-1 block w-full bg-slate-900 border-slate-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-white">
+                                <option value="Programado">Programado</option><option value="Realizado">Realizado</option>
+                           </select>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-slate-700 pt-6">
+                         <h4 class="text-lg font-semibold text-gray-200 mb-2">Guia de Feedback (COIN)</h4>
+                        <div class="space-y-4">
+                            <div>
+                                <label for="feedback-contexto" class="block text-sm font-medium text-gray-300">C - Contexto</label>
+                                <textarea id="feedback-contexto" rows="2" class="mt-1 block w-full bg-slate-900 border-slate-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-white" placeholder="Onde e quando a situação ocorreu? Ex: Na reunião de ontem..."></textarea>
+                            </div>
+                            <div>
+                                <label for="feedback-observacao" class="block text-sm font-medium text-gray-300">O - Observação</label>
+                                <textarea id="feedback-observacao" rows="3" class="mt-1 block w-full bg-slate-900 border-slate-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-white" placeholder="Descreva o fato ou comportamento, sem julgamento. Ex: Notei que você interrompeu X..."></textarea>
+                            </div>
+                             <div>
+                                <label for="feedback-impacto" class="block text-sm font-medium text-gray-300">I - Impacto</label>
+                                <textarea id="feedback-impacto" rows="2" class="mt-1 block w-full bg-slate-900 border-slate-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-white" placeholder="Qual foi o impacto (positivo ou negativo) disso? Ex: Isso pode dificultar a colaboração..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-slate-700 pt-6">
+                        <label class="block text-lg font-semibold text-gray-200">N - Novos Passos (Plano de Ação)</label>
+                        <div id="action-items-container" class="mt-2 space-y-3"></div>
+                        <button type="button" id="add-action-item-btn" class="mt-3 text-sm text-blue-400 hover:text-blue-300 font-medium flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                            Adicionar Ação
+                        </button>
+                    </div>
+                    
+                    <div class="border-t border-slate-700 pt-6">
+                        <h4 class="text-lg font-semibold text-gray-200 mb-2">Percepção do Colaborador</h4>
+                        <div>
+                            <label for="feedback-colaborador-percepcao" class="block text-sm font-medium text-gray-300">Anotações sobre a perspectiva do colaborador durante a conversa.</label>
+                            <textarea id="feedback-colaborador-percepcao" rows="3" class="mt-1 block w-full bg-slate-900 border-slate-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-white" placeholder="Registre aqui os pontos levantados pelo colaborador..."></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="px-6 py-4 bg-slate-900/50 flex justify-between items-center space-x-4 border-t border-slate-700">
+                <button id="delete-btn" class="bg-red-800 text-white font-bold px-4 py-2 rounded-lg hover:bg-red-700 transition flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                    Excluir
+                </button>
+                <div>
+                    <button id="cancel-btn" class="bg-slate-600 text-white font-bold px-4 py-2 rounded-lg hover:bg-slate-500 transition">Cancelar</button>
+                    <button id="save-btn" class="bg-blue-600 text-white font-bold px-5 py-2 rounded-lg hover:bg-blue-700 transition">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+<script type="module">
+    // --- MÓDULOS FIREBASE ---
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc, writeBatch, getDocs, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // --- VARIÁVEIS GLOBAIS ---
+    let app, db, auth;
+    let feedbackData = [];
+    let feedbackChart = null;
+    let actionsChartV1 = null;
+    let typesChart = null;
+    let feedbackCollectionRef;
+
+    // --- DADOS INICIAIS (PARA PRIMEIRO USO) ---
+    const initialData = [
+        {"Colaborador":"Samuel Alves","Data":"2025-08-01","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Guilherme Devens","Data":"2025-08-01","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Inácio","Data":"2025-08-04","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Jonatas Santana","Data":"2025-08-04","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Rafael Baqueiro","Data":"2025-08-05","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Josias Reis","Data":"2025-08-05","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Antonio Francisco","Data":"2025-08-06","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Rodrigo Clemente","Data":"2025-08-06","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Carlos Henrique","Data":"2025-08-07","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Lucas Urpia","Data":"2025-08-07","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Wagner Marinho","Data":"2025-08-08","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Mateus Esteves","Data":"2025-08-08","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Lerena Reis","Data":"2025-08-11","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Camilo Nunes","Data":"2025-08-11","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Liz","Data":"2025-08-12","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Diego Duque","Data":"2025-08-12","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Lucas Menezes","Data":"2025-08-13","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Tales Santana","Data":"2025-08-13","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Samuel Alves","Data":"2025-09-22","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Guilherme Devens","Data":"2025-09-22","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Inácio","Data":"2025-09-23","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Jonatas Santana","Data":"2025-09-23","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Rafael Baqueiro","Data":"2025-09-24","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Josias Reis","Data":"2025-09-24","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Antonio Francisco","Data":"2025-09-25","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Rodrigo Clemente","Data":"2025-09-25","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Carlos Henrique","Data":"2025-09-26","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Lucas Urpia","Data":"2025-09-26","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Wagner Marinho","Data":"2025-09-29","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Mateus Esteves","Data":"2025-09-29","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Lerena Reis","Data":"2025-09-30","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Camilo Nunes","Data":"2025-09-30","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Liz","Data":"2025-10-01","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Diego Duque","Data":"2025-10-01","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Lucas Menezes","Data":"2025-10-02","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Tales Santana","Data":"2025-10-02","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Samuel Alves","Data":"2025-10-03","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Guilherme Devens","Data":"2025-10-03","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Inácio","Data":"2025-10-06","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Jonatas Santana","Data":"2025-10-06","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Rafael Baqueiro","Data":"2025-10-07","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Josias Reis","Data":"2025-10-07","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Antonio Francisco","Data":"2025-10-08","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Rodrigo Clemente","Data":"2025-10-08","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Carlos Henrique","Data":"2025-10-09","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Lucas Urpia","Data":"2025-10-09","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Wagner Marinho","Data":"2025-10-10","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Mateus Esteves","Data":"2025-10-10","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Lerena Reis","Data":"2025-10-13","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Camilo Nunes","Data":"2025-10-13","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Liz","Data":"2025-10-14","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Diego Duque","Data":"2025-10-14","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Lucas Menezes","Data":"2025-10-15","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Tales Santana","Data":"2025-10-15","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Samuel Alves","Data":"2025-11-03","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Guilherme Devens","Data":"2025-11-03","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Inácio","Data":"2025-11-04","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Jonatas Santana","Data":"2025-11-04","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Rafael Baqueiro","Data":"2025-11-05","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Josias Reis","Data":"2025-11-05","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Antonio Francisco","Data":"2025-11-06","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Rodrigo Clemente","Data":"2025-11-06","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Carlos Henrique","Data":"2025-11-07","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Lucas Urpia","Data":"2025-11-07","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Wagner Marinho","Data":"2025-11-10","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Mateus Esteves","Data":"2025-11-10","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Lerena Reis","Data":"2025-11-11","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Camilo Nunes","Data":"2025-11-11","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Liz","Data":"2025-11-12","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Diego Duque","Data":"2025-11-12","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Lucas Menezes","Data":"2025-11-13","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Tales Santana","Data":"2025-11-13","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Samuel Alves","Data":"2025-12-01","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Guilherme Devens","Data":"2025-12-01","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Inácio","Data":"2025-12-02","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Jonatas Santana","Data":"2025-12-02","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Rafael Baqueiro","Data":"2025-12-03","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Josias Reis","Data":"2025-12-03","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Antonio Francisco","Data":"2025-12-04","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Rodrigo Clemente","Data":"2025-12-04","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Carlos Henrique","Data":"2025-12-05","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Lucas Urpia","Data":"2025-12-05","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Wagner Marinho","Data":"2025-12-08","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Mateus Esteves","Data":"2025-12-08","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Lerena Reis","Data":"2025-12-09","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Camilo Nunes","Data":"2025-12-09","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Liz","Data":"2025-12-10","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Diego Duque","Data":"2025-12-10","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Lucas Menezes","Data":"2025-12-11","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]},
+        {"Colaborador":"Tales Santana","Data":"2025-12-11","Tipo":"Check-in","Status":"Programado","Contexto":"","Observacao":"","Impacto":"","PercepcaoColaborador":"","Próximos Passos":[]}
+    ];
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- Seletores de DOM ---
+        const modal = document.getElementById('feedback-modal');
+        const addFeedbackBtn = document.getElementById('add-feedback-btn');
+        const cancelBtn = document.getElementById('cancel-btn');
+        const saveBtn = document.getElementById('save-btn');
+        const deleteBtn = document.getElementById('delete-btn');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const generateAnalysisBtn = document.getElementById('generate-analysis-btn');
+
+        // --- INICIALIZAÇÃO DO FIREBASE ---
+        const initializeFirebase = async () => {
+            try {
+          const firebaseConfig = {
+          apiKey: "AIzaSyBduagjI5LoJOa0qe6ySQJionTywc6WSsg",
+          authDomain: "app-teste-1-34b59.firebaseapp.com",
+          projectId: "app-teste-1-34b59",
+          storageBucket: "app-teste-1-34b59.firebasestorage.app",
+          messagingSenderId: "581853045940",
+          appId: "1:581853045940:web:0291ae141e3e725668e3e1",
+          measurementId: "G-5JBKPGLEGR"
+        };
+        const appId = "1:581853045940:web:0291ae141e3e725668e3e1"; // Seu App ID para o path da coleção
+        app = initializeApp(firebaseConfig);
+        db = getFirestore(app);
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                setLogLevel('error'); // Mudar para 'debug' para ver logs detalhados
+
+                onAuthStateChanged(auth, user => {
+                    if (user) {
+                        const userId = user.uid;
+                        const collectionPath = `/artifacts/${appId}/public/data/feedbacks`;
+                        feedbackCollectionRef = collection(db, collectionPath);
+                        loadData(); // Carrega os dados após a autenticação
+                    }
+                });
+
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Firebase initialization failed:", error);
+                document.getElementById('loading-overlay').innerHTML = `<p class="text-red-400">Falha ao conectar com o banco de dados. Tente recarregar a página.</p>`;
+            }
+        };
+        
+        // --- FUNÇÕES DE DADOS (FIRESTORE) ---
+        const seedInitialData = async () => {
+            const batch = writeBatch(db);
+            initialData.forEach(item => {
+                const docRef = doc(feedbackCollectionRef);
+                batch.set(docRef, item);
+            });
+            await batch.commit();
+        };
+
+        const loadData = () => {
+            onSnapshot(feedbackCollectionRef, async (snapshot) => {
+                if (snapshot.empty && initialData.length > 0) {
+                    await seedInitialData();
+                    return; // O snapshot será acionado novamente após o seed
+                }
+
+                feedbackData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderAll();
+
+                // Esconde a tela de loading e mostra o app
+                document.getElementById('loading-overlay').style.display = 'none';
+                document.getElementById('app-container').classList.remove('invisible');
+
+            }, error => {
+                console.error("Error listening to collection:", error);
+            });
+        };
+    
+        // --- Renderização Principal ---
+        const renderAll = () => {
+            if (!document.hidden) { // Evita renderizar se a aba não estiver visível
+                renderMetrics();
+                renderChart();
+                renderActionsChartV1();
+                renderTypesChart();
+                renderAccordion();
+                renderMasterActionList();
+            }
+        };
+
+        // --- Funções de Renderização Específicas (sem alterações) ---
+        const renderMetrics = () => {
+            const total = feedbackData.length;
+            const realizados = feedbackData.filter(item => item.Status === 'Realizado').length;
+            const progresso = total > 0 ? ((realizados / total) * 100).toFixed(0) : 0;
+            document.getElementById('metrics-container').innerHTML = `
+                <div class="bg-slate-800 p-5 rounded-xl border border-slate-700 shadow-lg"><h3 class="text-sm font-medium text-gray-400">Total de Feedbacks</h3><p class="mt-1 text-3xl font-bold text-white">${total}</p></div>
+                <div class="bg-slate-800 p-5 rounded-xl border border-slate-700 shadow-lg"><h3 class="text-sm font-medium text-gray-400">Realizados</h3><p class="mt-1 text-3xl font-bold" style="color: var(--color-accent-green);">${realizados}</p></div>
+                <div class="bg-slate-800 p-5 rounded-xl border border-slate-700 shadow-lg"><h3 class="text-sm font-medium text-gray-400">Programados</h3><p class="mt-1 text-3xl font-bold" style="color: var(--color-accent-orange);">${total - realizados}</p></div>
+                <div class="bg-slate-800 p-5 rounded-xl border border-slate-700 shadow-lg"><h3 class="text-sm font-medium text-gray-400">Progresso</h3><p class="mt-1 text-3xl font-bold" style="color: var(--color-accent-blue);">${progresso}%</p></div>
+            `;
+        };
+
+        const renderChart = () => {
+            const ctx = document.getElementById('feedback-chart').getContext('2d');
+            const labels = ['Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+            const data = {
+                labels,
+                datasets: [
+                    { label: 'Realizado', data: [], backgroundColor: 'rgba(16, 185, 129, 0.7)', borderColor: 'rgba(16, 185, 129, 1)', borderWidth: 1, borderRadius: 4 },
+                    { label: 'Programado', data: [], backgroundColor: 'rgba(245, 158, 11, 0.7)', borderColor: 'rgba(245, 158, 11, 1)', borderWidth: 1, borderRadius: 4 }
+                ]
+            };
+            const monthMap = { '08': 'Agosto', '09': 'Setembro', '10': 'Outubro', '11': 'Novembro', '12': 'Dezembro' };
+            labels.forEach(month => {
+                const monthNumber = Object.keys(monthMap).find(key => monthMap[key] === month);
+                const monthlyData = feedbackData.filter(item => item.Data && item.Data.substring(5, 7) === monthNumber);
+                data.datasets[0].data.push(monthlyData.filter(d => d.Status === 'Realizado').length);
+                data.datasets[1].data.push(monthlyData.filter(d => d.Status === 'Programado').length);
+            });
+
+            if (feedbackChart) feedbackChart.destroy();
+            Chart.defaults.color = '#9ca3af';
+            Chart.register(ChartDataLabels);
+            feedbackChart = new Chart(ctx, {
+                type: 'bar', 
+                data,
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: { x: { stacked: true, grid: { color: 'rgba(55, 65, 81, 0.5)' } }, y: { stacked: true, beginAtZero: true, grid: { color: 'rgba(55, 65, 81, 0.5)' }, ticks: { stepSize: 1 } } },
+                    plugins: { 
+                        legend: { position: 'top', labels: { color: '#f9fafb' } },
+                        tooltip: { callbacks: { label: (context) => `${context.dataset.label}: ${context.raw}` } },
+                        datalabels: {
+                            formatter: (value, ctx) => {
+                                if (value === 0) return '';
+                                let sum = 0;
+                                ctx.chart.data.datasets.forEach(dataset => { sum += dataset.data[ctx.dataIndex] || 0; });
+                                return (value * 100 / sum).toFixed(0) + "%";
+                            },
+                            color: '#fff',
+                            font: { weight: 'bold' }
+                        }
+                    }
+                }
+            });
+        };
+        
+        const renderActionsChartV1 = () => {
+            const ctx = document.getElementById('actions-chart-v1').getContext('2d');
+            const allActions = feedbackData.flatMap(fb => fb['Próximos Passos'] || []);
+            
+            const responsaveis = ['Líder', 'Colaborador', 'Líder + Colaborador'];
+            const datasets = [
+                { label: 'Concluídas', backgroundColor: 'rgba(16, 185, 129, 0.7)', data: [], rawData: [] },
+                { label: 'Pendentes', backgroundColor: 'rgba(245, 158, 11, 0.7)', data: [], rawData: [] }
+            ];
+
+            responsaveis.forEach(r => {
+                const actionsByResponsavel = allActions.filter(action => action.responsavel === r);
+                const concluidas = actionsByResponsavel.filter(a => a.completed).length;
+                const pendentes = actionsByResponsavel.length - concluidas;
+                const total = concluidas + pendentes;
+
+                datasets[0].rawData.push(concluidas);
+                datasets[1].rawData.push(pendentes);
+                datasets[0].data.push(total > 0 ? (concluidas / total) * 100 : 0);
+                datasets[1].data.push(total > 0 ? (pendentes / total) * 100 : 0);
+            });
+
+            if (actionsChartV1) actionsChartV1.destroy();
+            actionsChartV1 = new Chart(ctx, {
+                type: 'bar',
+                data: { labels: responsaveis, datasets },
+                plugins: [ChartDataLabels],
+                options: { 
+                    indexAxis: 'y', responsive: true, maintainAspectRatio: false, 
+                    scales: { x: { stacked: true, max: 100, grid: { color: 'rgba(55, 65, 81, 0.5)' }, ticks: { callback: (value) => value + '%' } }, y: { stacked: true, grid: { display: false } } },
+                    plugins: { 
+                        legend: { position: 'bottom', labels: { color: '#f9fafb' }},
+                        tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${c.dataset.rawData[c.dataIndex]} (${c.raw.toFixed(1)}%)`}},
+                        datalabels: { formatter: (v) => v > 5 ? v.toFixed(0) + '%' : '', color: '#fff', font: { weight: 'bold' } }
+                    }
+                }
+            });
+        };
+
+        const renderTypesChart = () => {
+            const ctx = document.getElementById('types-chart').getContext('2d');
+            const typesCount = feedbackData.reduce((acc, fb) => { acc[fb.Tipo] = (acc[fb.Tipo] || 0) + 1; return acc; }, {});
+            
+            const chartData = {
+                labels: Object.keys(typesCount),
+                datasets: [{ data: Object.values(typesCount), backgroundColor: ['rgba(59, 130, 246, 0.7)', 'rgba(16, 185, 129, 0.7)', 'rgba(245, 158, 11, 0.7)', 'rgba(239, 68, 68, 0.7)', 'rgba(139, 92, 246, 0.7)'], borderColor: '#1f2937'}]
+            };
+
+            if (typesChart) typesChart.destroy();
+            typesChart = new Chart(ctx, {
+                type: 'doughnut', data: chartData, plugins: [ChartDataLabels],
+                options: { 
+                    responsive: true, maintainAspectRatio: false, 
+                    plugins: { 
+                        legend: { position: 'bottom', labels: { color: '#f9fafb' }},
+                        tooltip: { callbacks: { label: (c) => `${c.label}: ${c.raw}` } },
+                        datalabels: {
+                            formatter: (value, ctx) => {
+                                const sum = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                                return sum > 0 ? (value * 100 / sum).toFixed(1) + "%" : '';
+                            },
+                            color: '#fff', font: { weight: 'bold' }
+                        }
+                    }
+                }
+            });
+        };
+
+        const renderAccordion = () => {
+            const accordionContainer = document.getElementById('feedback-accordion');
+            accordionContainer.innerHTML = '';
+            const groupedByMonth = feedbackData.reduce((acc, item) => {
+                if(!item.Data) return acc;
+                const month = new Date(item.Data).toLocaleString('pt-BR', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+                (acc[month] = acc[month] || []).push(item);
+                return acc;
+            }, {});
+            const sortedMonths = Object.keys(groupedByMonth).sort((a, b) => {
+                const dateA = new Date(groupedByMonth[a][0].Data);
+                const dateB = new Date(groupedByMonth[b][0].Data);
+                return dateA - dateB;
+            });
+            
+            const currentMonthKey = new Date().toLocaleString('pt-BR', { month: 'long', year: 'numeric' });
+            
+            sortedMonths.forEach((month) => {
+                const items = groupedByMonth[month];
+                const realizados = items.filter(i => i.Status === 'Realizado').length;
+                const isCurrentMonth = month.toLowerCase() === currentMonthKey.toLowerCase();
+                
+                const monthElement = document.createElement('div');
+                monthElement.className = 'bg-slate-800 border border-slate-700 rounded-xl overflow-hidden shadow-lg';
+                monthElement.innerHTML = `
+                    <button class="accordion-header w-full flex justify-between items-center p-5 text-left" aria-expanded="${isCurrentMonth}">
+                        <div class="flex items-center"><span class="text-lg font-semibold text-gray-100 capitalize">${month}</span><span class="ml-4 px-3 py-1 text-xs font-medium text-green-300 bg-green-900/50 rounded-full">${realizados}/${items.length} Realizados</span></div>
+                        <svg class="accordion-arrow w-6 h-6 text-gray-400 transition-transform duration-300 ${isCurrentMonth ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="accordion-content p-5 pt-0 border-t border-slate-700 ${isCurrentMonth ? '' : 'hidden'}"><div class="divide-y divide-slate-700">${items.sort((a,b) => new Date(a.Data) - new Date(b.Data)).map(createFeedbackItemHTML).join('')}</div></div>`;
+                accordionContainer.appendChild(monthElement);
+            });
+            accordionContainer.querySelectorAll('.accordion-header').forEach(h => h.addEventListener('click', () => {
+                h.setAttribute('aria-expanded', h.getAttribute('aria-expanded') !== 'true');
+                h.nextElementSibling.classList.toggle('hidden');
+                h.querySelector('.accordion-arrow').classList.toggle('rotate-180');
+            }));
+            accordionContainer.querySelectorAll('.edit-btn').forEach(btn => btn.addEventListener('click', handleEdit));
+        };
+        
+        const createFeedbackItemHTML = (item) => {
+            const statusColor = item.Status === 'Realizado' ? 'bg-green-500' : 'bg-amber-500';
+            const hasNotes = item.Contexto || item.Observacao || item.Impacto || item.PercepcaoColaborador;
+            const hasActions = item['Próximos Passos'] && item['Próximos Passos'].length > 0;
+            return `<div class="flex items-center justify-between py-4">
+                        <div class="flex items-center">
+                            <div class="w-2.5 h-2.5 rounded-full ${statusColor} mr-4"></div>
+                            <div>
+                                <p class="font-medium text-gray-100">${item.Colaborador}</p>
+                                <p class="text-sm text-gray-400">${item.Data ? new Date(item.Data).toLocaleDateString('pt-BR', {day: '2-digit', month: 'short', timeZone: 'UTC'}) : 'Sem data'} - ${item.Tipo}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="flex items-center gap-2">
+                                ${hasNotes ? `<svg xmlns="http://www.w3.org/2000/svg" title="Contém anotações" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg>` : ''}
+                                ${hasActions ? `<svg xmlns="http://www.w3.org/2000/svg" title="Contém plano de ação" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" /><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd" /></svg>` : ''}
+                            </div>
+                            <button class="edit-btn text-sm font-medium text-blue-400 hover:text-blue-300" data-id="${item.id}">Detalhes</button>
+                        </div>
+                    </div>`;
+        };
+
+        const renderMasterActionList = () => {
+            const container = document.getElementById('master-action-list');
+            const allActions = feedbackData.flatMap(fb => (fb['Próximos Passos'] || []).map(action => ({...action, Colaborador: fb.Colaborador, feedbackId: fb.id })));
+            
+            if (allActions.length === 0) {
+                container.innerHTML = '<p class="text-gray-400">Nenhum plano de ação definido.</p>';
+                return;
+            }
+
+            container.innerHTML = allActions
+                .sort((a, b) => (a.completed - b.completed) || (new Date(a.dueDate) - new Date(b.dueDate)))
+                .map(action => `
+                    <div class="action-item flex items-center gap-4 bg-slate-900 p-3 rounded-lg border border-slate-700">
+                        <input type="checkbox" data-feedback-id="${action.feedbackId}" data-action-id="${action.id}" class="master-action-checkbox h-5 w-5 rounded bg-slate-700 border-slate-600 text-blue-500 focus:ring-blue-500" ${action.completed ? 'checked' : ''}>
+                        <div class="flex-grow"><label class="text-gray-100 ${action.completed ? 'line-through text-gray-500' : ''}">${action.text}</label><p class="text-xs text-gray-400">${action.Colaborador} &bull; ${action.responsavel || 'N/D'}</p></div>
+                        <div class="text-right"><span class="px-3 py-1 text-xs font-medium rounded-full ${action.completed ? 'bg-green-900/50 text-green-300' : 'bg-amber-900/50 text-amber-300'}">${action.completed ? 'Concluído' : 'Pendente'}</span><p class="text-xs text-gray-400 mt-1">Prazo: ${action.dueDate ? new Date(action.dueDate).toLocaleDateString('pt-BR', {timeZone: 'UTC'}) : 'N/D'}</p></div>
+                    </div>
+                `).join('');
+            
+            container.querySelectorAll('.master-action-checkbox').forEach(cb => cb.addEventListener('change', handleMasterActionCheck));
+        };
+
+        // --- Lógica do Modal ---
+        const openModal = () => modal.classList.remove('hidden');
+        const closeModal = () => modal.classList.add('hidden');
+        
+        const handleAdd = () => {
+            document.getElementById('modal-title').textContent = 'Novo Registro de Feedback';
+            document.getElementById('feedback-form').reset();
+            document.getElementById('feedback-id').value = '';
+            document.getElementById('data').valueAsDate = new Date();
+            document.getElementById('delete-btn').style.display = 'none';
+            renderActionItems([]);
+            openModal();
+        };
+
+        const handleEdit = (event) => {
+            const id = event.target.dataset.id;
+            const item = feedbackData.find(fb => fb.id === id);
+            if (!item) return;
+            document.getElementById('modal-title').textContent = 'Detalhes do Feedback';
+            document.getElementById('feedback-id').value = item.id;
+            document.getElementById('colaborador').value = item.Colaborador;
+            document.getElementById('data').value = item.Data;
+            document.getElementById('tipo').value = item.Tipo;
+            document.getElementById('status').value = item.Status;
+            document.getElementById('feedback-contexto').value = item.Contexto || '';
+            document.getElementById('feedback-observacao').value = item.Observacao || '';
+            document.getElementById('feedback-impacto').value = item.Impacto || '';
+            document.getElementById('feedback-colaborador-percepcao').value = item.PercepcaoColaborador || '';
+            document.getElementById('delete-btn').style.display = 'flex';
+            renderActionItems(item['Próximos Passos'] || []);
+            openModal();
+        };
+
+        const handleSave = async (event) => {
+            event.preventDefault();
+            const id = document.getElementById('feedback-id').value;
+            const actionItems = Array.from(document.querySelectorAll('#action-items-container .action-item')).map(div => ({
+                id: div.dataset.id, text: div.querySelector('.action-text').value, dueDate: div.querySelector('.action-duedate').value, 
+                responsavel: div.querySelector('.action-responsavel').value, completed: div.querySelector('.action-completed').checked
+            }));
+
+            const formData = {
+                Colaborador: document.getElementById('colaborador').value.trim(), Data: document.getElementById('data').value, Tipo: document.getElementById('tipo').value,
+                Status: document.getElementById('status').value, Contexto: document.getElementById('feedback-contexto').value.trim(),
+                Observacao: document.getElementById('feedback-observacao').value.trim(), Impacto: document.getElementById('feedback-impacto').value.trim(),
+                PercepcaoColaborador: document.getElementById('feedback-colaborador-percepcao').value.trim(), 'Próximos Passos': actionItems
+            };
+
+            if (!formData.Colaborador || !formData.Data) {
+                console.error('Os campos "Colaborador" e "Data" são obrigatórios.');
+                return;
+            }
+
+            saveBtn.disabled = true;
+            try {
+                if (id) {
+                    await updateDoc(doc(feedbackCollectionRef, id), formData);
+                } else {
+                    await addDoc(feedbackCollectionRef, formData);
+                }
+                closeModal();
+            } catch(error) {
+                console.error("Erro ao salvar dados: ", error);
+            } finally {
+                saveBtn.disabled = false;
+            }
+        };
+
+        const handleDelete = async () => {
+            const id = document.getElementById('feedback-id').value;
+            if (id) {
+                deleteBtn.disabled = true;
+                try {
+                    await deleteDoc(doc(feedbackCollectionRef, id));
+                    closeModal();
+                } catch(error) {
+                    console.error("Erro ao excluir: ", error);
+                } finally {
+                    deleteBtn.disabled = false;
+                }
+            }
+        }
+
+        const renderActionItems = (items) => {
+            const container = document.getElementById('action-items-container');
+            container.innerHTML = '';
+            if (!items) return;
+            items.sort((a, b) => a.completed - b.completed)
+                 .forEach(item => container.appendChild(createActionItemElement(item)));
+        };
+
+        const createActionItemElement = (item) => {
+            const div = document.createElement('div');
+            div.className = 'action-item bg-slate-700 p-3 rounded-md border border-slate-600 space-y-3';
+            div.dataset.id = item.id;
+            div.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <input type="checkbox" class="action-completed h-5 w-5 rounded bg-slate-800 border-slate-600 text-blue-500 focus:ring-blue-500" ${item.completed ? 'checked' : ''}>
+                    <input type="text" class="action-text flex-grow bg-transparent border-0 text-white focus:ring-0 p-1" value="${item.text || ''}" placeholder="Descreva a ação...">
+                    <button type="button" class="remove-action-item-btn text-gray-500 hover:text-red-500 text-xl">&times;</button>
+                </div>
+                <div class="flex items-center gap-4 pl-8">
+                    <div>
+                        <label class="text-xs text-gray-400">Responsável</label>
+                        <select class="action-responsavel bg-slate-800 border-slate-600 text-white text-xs rounded-md p-1 focus:ring-0 focus:border-blue-500">
+                            <option ${item.responsavel === 'Líder' ? 'selected' : ''}>Líder</option>
+                            <option ${item.responsavel === 'Colaborador' ? 'selected' : ''}>Colaborador</option>
+                            <option ${item.responsavel === 'Líder + Colaborador' ? 'selected' : ''}>Líder + Colaborador</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-xs text-gray-400">Prazo</label>
+                        <input type="date" class="action-duedate bg-slate-800 border-slate-600 text-white text-xs rounded-md p-1 focus:ring-0 focus:border-blue-500" value="${item.dueDate || ''}">
+                    </div>
+                </div>`;
+            div.querySelector('.remove-action-item-btn').addEventListener('click', () => div.remove());
+            return div;
+        };
+        
+        const handleAddActionItem = () => {
+             document.getElementById('action-items-container').appendChild(createActionItemElement({ id: crypto.randomUUID(), text: '', dueDate: '', responsavel: 'Líder', completed: false }));
+        };
+
+        const handleMasterActionCheck = async (event) => {
+            const { feedbackId, actionId } = event.target.dataset;
+            const feedback = feedbackData.find(fb => fb.id === feedbackId);
+            if(feedback && feedback['Próximos Passos']){
+                const updatedActions = feedback['Próximos Passos'].map(a => 
+                    a.id === actionId ? { ...a, completed: event.target.checked } : a
+                );
+                try {
+                    await updateDoc(doc(feedbackCollectionRef, feedbackId), { 'Próximos Passos': updatedActions });
+                } catch (error) {
+                    console.error("Erro ao atualizar ação:", error);
+                }
+            }
+        };
+        
+        // --- Lógica das Abas ---
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                tabContents.forEach(content => content.classList.toggle('hidden', content.id !== `${tab.dataset.tab}-content`));
+            });
+        });
+
+        // --- Análise Rápida (Simulada) ---
+        const handleGenerateAnalysis = () => {
+            const output = document.getElementById('analysis-output');
+            const btn = document.getElementById('generate-analysis-btn');
+            const allFeedbackText = feedbackData.map(fb => `${fb.Contexto} ${fb.Observacao} ${fb.Impacto} ${fb.PercepcaoColaborador}`).filter(text => text.trim() !== '').join(' ');
+
+            if (allFeedbackText.trim() === '') {
+                output.textContent = 'Nenhuma anotação foi registrada para análise.';
+                return;
+            }
+            
+            btn.disabled = true;
+            btn.innerHTML = `<div class="spinner mr-2"></div> Analisando...`;
+            output.innerHTML = '<span class="blinking">Analisando percepções da equipe...</span>';
+
+            setTimeout(() => {
+                const themes = [];
+                if (allFeedbackText.toLowerCase().includes('remunera') || allFeedbackText.toLowerCase().includes('salário')) themes.push({ theme: 'Carreira e Remuneração', detail: 'Há uma percepção de que a remuneração para carreiras técnicas pode estar abaixo do mercado, impactando a motivação.' });
+                if (allFeedbackText.toLowerCase().includes('processo') || allFeedbackText.toLowerCase().includes('urgência')) themes.push({ theme: 'Processos e Carga de Trabalho', detail: 'A falta de processos claros leva a um excesso de urgências e cobranças, dificultando o planejamento e gerando estresse.' });
+                if (allFeedbackText.toLowerCase().includes('reconhecimento') || allFeedbackText.toLowerCase().includes('transparência')) themes.push({ theme: 'Reconhecimento', detail: 'A equipe valoriza o reconhecimento, mas deseja mais clareza e transparência nos critérios utilizados.' });
+                if (themes.length === 0) themes.push({ theme: 'Sentimento Geral Positivo', detail: 'Não foram identificados temas negativos recorrentes. A equipe parece estar alinhada e sem grandes preocupações.' });
+                
+                output.innerHTML = `<h3 class="font-semibold text-lg text-gray-100 mb-3">Principais Temas Identificados:</h3><ul class="list-disc list-inside space-y-2 text-gray-300">${themes.map(item => `<li><strong class="text-blue-400">${item.theme}:</strong> ${item.detail}</li>`).join('')}</ul>`;
+                btn.disabled = false;
+                btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="mr-2" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10H8"/><path d="M12 20V10H16"/><path d="M12 20V4"/><path d="M20 12H4"/></svg> Gerar Análise Rápida`;
+            }, 1500);
+        };
+
+        // --- Inicialização e Listeners ---
+        addFeedbackBtn.addEventListener('click', handleAdd);
+        cancelBtn.addEventListener('click', closeModal);
+        closeModalBtn.addEventListener('click', closeModal);
+        saveBtn.addEventListener('click', handleSave);
+        deleteBtn.addEventListener('click', handleDelete);
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+        document.getElementById('add-action-item-btn').addEventListener('click', handleAddActionItem);
+        generateAnalysisBtn.addEventListener('click', handleGenerateAnalysis);
+
+        initializeFirebase();
+    });
+</script>
+</body>
+</html>
+
