@@ -688,7 +688,6 @@
             event.preventDefault();
             const id = document.getElementById('feedback-id').value;
             const actionItems = Array.from(document.querySelectorAll('#action-items-container .action-item')).map(div => {
-                // Check if the input elements exist before accessing their value
                 const textInput = div.querySelector('.action-text');
                 const dueDateInput = div.querySelector('.action-duedate');
                 const responsavelSelect = div.querySelector('.action-responsavel');
@@ -721,6 +720,8 @@
             }
 
             saveBtn.disabled = true;
+            saveBtn.innerHTML = `<div class="spinner mr-2"></div> Salvando...`;
+            
             try {
                 if (id) {
                     await updateDoc(doc(feedbackCollectionRef, id), formData);
@@ -730,8 +731,21 @@
                 closeModal();
             } catch(error) {
                 console.error("Erro ao salvar dados: ", error);
+                // Exibe uma mensagem de erro mais clara para o usuário, sem usar alert()
+                const errorMessage = "Erro ao salvar. Verifique sua conexão e tente novamente. Detalhes: " + error.message;
+                const modalFooter = document.querySelector('#feedback-modal .px-6.py-4');
+                const existingError = modalFooter.querySelector('.error-message');
+                if (existingError) {
+                    existingError.textContent = errorMessage;
+                } else {
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'error-message text-red-400 text-sm mt-2';
+                    errorDiv.textContent = errorMessage;
+                    modalFooter.insertBefore(errorDiv, saveBtn.parentNode.nextSibling);
+                }
             } finally {
                 saveBtn.disabled = false;
+                saveBtn.innerHTML = `Salvar`;
             }
         };
 
